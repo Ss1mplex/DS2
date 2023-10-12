@@ -43,7 +43,7 @@ class AggregationServerThread extends Thread {
             // 读取HTTP请求，直到请求主体的JSON数据
             while ((inputLine = in.readLine()) != null) {
                 request.append(inputLine).append("\n");
-                if (inputLine.isEmpty()) {
+                if (inputLine.isEmpty() || inputLine.trim().isEmpty()) {
                     break; // 当遇到空行时，请求头结束
                 }
             }
@@ -75,11 +75,13 @@ class AggregationServerThread extends Thread {
         int startIndex = httpRequest.indexOf("{");
         int endIndex = httpRequest.lastIndexOf("}");
         if (startIndex != -1 && endIndex != -1) {
-            return httpRequest.substring(startIndex, endIndex + 1);
+            String jsonData = httpRequest.substring(startIndex, endIndex + 1);
+            return jsonData;
         } else {
             return "{}"; // 如果没有找到JSON数据，返回空JSON对象
         }
     }
+
 
     private void updateAggregatedData(String jsonData) {
         try {
@@ -116,6 +118,4 @@ class AggregationServerThread extends Thread {
             e.printStackTrace();
         }
     }
-
-
 }

@@ -7,6 +7,9 @@ SRC_DIR = src
 # Define the output directory
 OUT_DIR = out
 
+# Create the output directory
+$(shell mkdir -p $(OUT_DIR))
+
 # Find all .java files in the source directory
 SOURCES = $(wildcard $(SRC_DIR)/*.java)
 

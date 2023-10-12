@@ -10,18 +10,18 @@ OUT_DIR = out
 # Find all .java files in the source directory
 SOURCES = $(wildcard $(SRC_DIR)/*.java)
 
-# Find all .jar files in the root directory
-LIBS = $(wildcard ./*.jar)
+# Include the new source file LamportClock.java
+SOURCES += $(SRC_DIR)/LamportClock.java
 
 # Create the corresponding .class file paths
-CLASSES = $(patsybst $(SRC_DIR)/%.java,$(OUT_DIR)/%.class,$(SOURCES))
+CLASSES = $(patsubst $(SRC_DIR)/%.java,$(OUT_DIR)/%.class,$(SOURCES))
 
 # Default target: build all .class files
 all: $(CLASSES)
 
-# Compile .java files to ..class files with library included
+# Compile .java files to .class files
 $(OUT_DIR)/%.class: $(SRC_DIR)/%.java
-	$(JAVAC) -d $(OUT_DIR) -cp $(LIBS) $<
+	$(JAVAC) -d $(OUT_DIR) $<
 
 # Clean the compiled .class files
 clean:
@@ -29,11 +29,11 @@ clean:
 
 # Run the AggregationServer
 run-aggregation-server:
-	java -cp $(OUT_DIR):$(LIBS) AggregationServer
+	java -cp $(OUT_DIR) AggregationServer
 
 # Run the ContentServer
 run-content-server:
-	java -cp $(OUT_DIR):$(LIBS) ContentServer
+	java -cp $(OUT_DIR) ContentServer
 
 # Run the GetClient
 run-get-client:

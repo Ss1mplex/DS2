@@ -1,0 +1,18 @@
+{
+    "local_date_time_full": "20230715160000",
+    "rel_hum": 60,
+    "cloud": "Partly cloudy",
+    "lon": 138.6,
+    "air_temp": 13.3,
+    "press": 1023.9,
+    "wind_dir": "S",
+    "wind_spd_kmh": 15,
+    "state": "SA",
+    "time_zone": "CST",
+    "id": "IDS60901",
+    "lat": -34.9,
+    "name": "Adelaide (West Terrace /  ngayirdapira)",
+    "apparent_t": 9.5,
+    "dewpt": 5.7,
+    "wind_spd_kt": 8
+}

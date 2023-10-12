@@ -7,21 +7,21 @@ SRC_DIR = src
 # Define the output directory
 OUT_DIR = out
 
-# Create the output directory
-$(shell mkdir -p $(OUT_DIR))
-
 # Find all .java files in the source directory
 SOURCES = $(wildcard $(SRC_DIR)/*.java)
 
+# Find all .jar files in the root directory
+LIBS = $(wildcard ./*.jar)
+
 # Create the corresponding .class file paths
-CLASSES = $(patsubst $(SRC_DIR)/%.java,$(OUT_DIR)/%.class,$(SOURCES))
+CLASSES = $(patsybst $(SRC_DIR)/%.java,$(OUT_DIR)/%.class,$(SOURCES))
 
 # Default target: build all .class files
 all: $(CLASSES)
 
-# Compile .java files to .class files
+# Compile .java files to ..class files with library included
 $(OUT_DIR)/%.class: $(SRC_DIR)/%.java
-	$(JAVAC) -d $(OUT_DIR) $<
+	$(JAVAC) -d $(OUT_DIR) -cp $(LIBS) $<
 
 # Clean the compiled .class files
 clean:
@@ -29,11 +29,11 @@ clean:
 
 # Run the AggregationServer
 run-aggregation-server:
-	java -cp $(OUT_DIR) AggregationServer
+	java -cp $(OUT_DIR):$(LIBS) AggregationServer
 
 # Run the ContentServer
 run-content-server:
-	java -cp $(OUT_DIR) ContentServer
+	java -cp $(OUT_DIR):$(LIBS) ContentServer
 
 # Run the GetClient
 run-get-client:

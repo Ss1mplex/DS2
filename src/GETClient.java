@@ -17,13 +17,13 @@ public class GETClient {
             Socket socket = new Socket(serverAddress, serverPort);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            // 创建 GET 请求
-            String getRequest = "GET /weather.json HTTP/1.1";
+
+            String getRequest = "GET /data.txt HTTP/1.1";
             out.println(getRequest);
             out.println("User-Agent: GETClient/1.0");
             out.println();
 
-            // 读取响应数据
+
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String response;
             while ((response = in.readLine()) != null) {

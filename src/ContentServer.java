@@ -7,7 +7,7 @@ public class ContentServer {
     public static void main(String[] args) {
         String serverAddress = "localhost";
         int serverPort = 4567;
-        String dataFilePath = "data.txt"; // 输入文件路径
+        String dataFilePath = "data.txt";
 
         if (args.length > 0) {
             serverAddress = args[0];
@@ -20,22 +20,22 @@ public class ContentServer {
         }
 
         try {
-            // 从输入文件读取数据
+
             BufferedReader dataReader = new BufferedReader(new FileReader(dataFilePath));
             String jsonData = convertToJSON(dataReader);
 
-            // 输出发送的请求内容
+
             System.out.println("Request Sent:");
             System.out.println(jsonData);
 
             Socket socket = new Socket(serverAddress, serverPort);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            // 创建 PUT 请求
+
             String putRequest = createPutRequest("data.txt", jsonData);
             out.println(putRequest);
 
-            // 等待确认响应
+
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String response;
             while ((response = in.readLine()) != null) {

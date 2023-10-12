@@ -4,7 +4,7 @@ import org.json.*;
 
 public class AggregationServer {
     public static void main(String[] args) {
-        int port = 4567; // 默认端口
+        int port = 4567;
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);
         }
@@ -40,21 +40,21 @@ class AggregationServerThread extends Thread {
             String inputLine;
             StringBuilder request = new StringBuilder();
 
-            // 读取HTTP请求，直到请求主体的JSON数据
+
             while ((inputLine = in.readLine()) != null) {
                 request.append(inputLine).append("\n");
                 if (inputLine.isEmpty() || inputLine.trim().isEmpty()) {
-                    break; // 当遇到空行时，请求头结束
+                    break;
                 }
             }
 
             if (request.toString().startsWith("PUT")) {
-                // 解析请求并更新聚合数据
+
                 String jsonData = extractJsonData(request.toString());
                 updateAggregatedData(jsonData);
-                out.println("HTTP/1.1 200 OK"); // 确认响应
+                out.println("HTTP/1.1 200 OK");
             }
-            // 处理GET请求
+
             else if (request.toString().startsWith("GET")) {
                 out.println("HTTP/1.1 200 OK");
                 out.println("Content-Type: application/json");
@@ -71,14 +71,14 @@ class AggregationServerThread extends Thread {
     }
 
     private String extractJsonData(String httpRequest) {
-        // 从HTTP请求中提取JSON数据部分
+
         int startIndex = httpRequest.indexOf("{");
         int endIndex = httpRequest.lastIndexOf("}");
         if (startIndex != -1 && endIndex != -1) {
             String jsonData = httpRequest.substring(startIndex, endIndex + 1);
             return jsonData;
         } else {
-            return "{}"; // 如果没有找到JSON数据，返回空JSON对象
+            return "{}";
         }
     }
 
@@ -89,7 +89,7 @@ class AggregationServerThread extends Thread {
             JSONObject json = new JSONObject(jsonData);
 
             String id = json.getString("id");
-            // 检查是否已存在该 ID 的数据
+
             if (aggregatedData.has(id)) {
                 JSONObject existingData = aggregatedData.getJSONObject(id);
 
@@ -111,7 +111,7 @@ class AggregationServerThread extends Thread {
                 existingData.put("wind_spd_kmh", json.getInt("wind_spd_kmh"));
                 existingData.put("wind_spd_kt", json.getInt("wind_spd_kt"));
             } else {
-                // 如果数据不存在，直接添加
+
                 aggregatedData.put(id, json);
             }
         } catch (JSONException e) {

@@ -1,4 +1,4 @@
-import org.json.JSONObject;
+import org.json.*;
 
 import java.io.*;
 import java.net.*;
@@ -20,10 +20,8 @@ public class ContentServer {
         }
 
         try {
-
             BufferedReader dataReader = new BufferedReader(new FileReader(dataFilePath));
             String jsonData = convertToJSON(dataReader);
-
 
             System.out.println("Request Sent:");
             System.out.println(jsonData);
@@ -31,10 +29,8 @@ public class ContentServer {
             Socket socket = new Socket(serverAddress, serverPort);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-
             String putRequest = createPutRequest("data.txt", jsonData);
             out.println(putRequest);
-
 
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String response;
@@ -78,11 +74,8 @@ public class ContentServer {
         request.append("Content-Length: ").append(jsonData.length()).append("\n\n");
         request.append(jsonData);
 
-
-        System.out.println("Request Sent: " + request.toString());
+        System.out.println("Request Sent: " + request);
 
         return request.toString();
     }
-
-
 }

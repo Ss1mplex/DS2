@@ -1,6 +1,6 @@
+import org.json.*;
 import java.io.*;
 import java.net.*;
-import org.json.*;
 
 public class AggregationServer {
     public static void main(String[] args) {
@@ -23,13 +23,17 @@ public class AggregationServer {
     }
 }
 
+
+
 class AggregationServerThread extends Thread {
+    private LamportClock lamportClock;
     private Socket clientSocket;
     private JSONObject aggregatedData;
 
     public AggregationServerThread(Socket socket) {
         this.clientSocket = socket;
         this.aggregatedData = new JSONObject();
+        this.lamportClock = new LamportClock();
     }
 
     public void run() {
@@ -40,8 +44,8 @@ class AggregationServerThread extends Thread {
             String inputLine;
             StringBuilder request = new StringBuilder();
 
-
             while ((inputLine = in.readLine()) != null) {
+                lamportClock.tick();
                 request.append(inputLine).append("\n");
                 if (inputLine.isEmpty() || inputLine.trim().isEmpty()) {
                     break;
@@ -49,13 +53,10 @@ class AggregationServerThread extends Thread {
             }
 
             if (request.toString().startsWith("PUT")) {
-
                 String jsonData = extractJsonData(request.toString());
                 updateAggregatedData(jsonData);
                 out.println("HTTP/1.1 200 OK");
-            }
-
-            else if (request.toString().startsWith("GET")) {
+            } else if (request.toString().startsWith("GET")) {
                 out.println("HTTP/1.1 200 OK");
                 out.println("Content-Type: application/json");
                 out.println();
@@ -71,7 +72,6 @@ class AggregationServerThread extends Thread {
     }
 
     private String extractJsonData(String httpRequest) {
-
         int startIndex = httpRequest.indexOf("{");
         int endIndex = httpRequest.lastIndexOf("}");
         if (startIndex != -1 && endIndex != -1) {
@@ -81,7 +81,6 @@ class AggregationServerThread extends Thread {
             return "{}";
         }
     }
-
 
     private void updateAggregatedData(String jsonData) {
         try {
@@ -93,7 +92,7 @@ class AggregationServerThread extends Thread {
             if (aggregatedData.has(id)) {
                 JSONObject existingData = aggregatedData.getJSONObject(id);
 
-                // 更新字段
+
                 existingData.put("name", json.getString("name"));
                 existingData.put("state", json.getString("state"));
                 existingData.put("time_zone", json.getString("time_zone"));
@@ -111,7 +110,6 @@ class AggregationServerThread extends Thread {
                 existingData.put("wind_spd_kmh", json.getInt("wind_spd_kmh"));
                 existingData.put("wind_spd_kt", json.getInt("wind_spd_kt"));
             } else {
-
                 aggregatedData.put(id, json);
             }
         } catch (JSONException e) {

@@ -1,50 +1,36 @@
-# Makefile for your Java project
-
-# Define the source directory
-SRC_DIR = src
-
-# Define the Java compiler and flags
 JAVAC = javac
-JAVAC_FLAGS = -cp .:$(wildcard *.jar) -d bin
+JAR_FILES = commons-beanutils-1.9.4.jar commons-collections-3.2.2.jar commons-lang-2.6.jar commons-logging-1.2.jar ezmorph-1.0.6.jar json-20230618.jar json-lib-2.4-jdk15.jar minimal-json-0.9.5.jar
 
-# Define the main classes for your applications
-AGGREGATION_SERVER = AggregationServer
-CONTENT_SERVER = ContentServer
-LAMPORT_CLOCK = LamportClock
-GET_CLIENT = GETClient
-
-# Define the output directory
+SRC_DIR = src
 BIN_DIR = bin
 
-# List of all Java source files
+# List of Java source files
 SOURCES = $(wildcard $(SRC_DIR)/*.java)
 
-# List of all compiled class files
-CLASSES = $(SOURCES:$(SRC_DIR)/%.java=$(BIN_DIR)/%.class)
+# Classpath for compilation
+CLASSPATH = $(addprefix $(BIN_DIR)/,$(JAR_FILES))
 
-# Main target
-all: $(CLASSES)
+# Targets for AggregationServer, ContentServer, LamportClock, and GETClient
+AGGREGATION_SERVER = $(BIN_DIR)/AggregationServer.class
+CONTENT_SERVER = $(BIN_DIR)/ContentServer.class
+LAMPORT_CLOCK = $(BIN_DIR)/LamportClock.class
+GET_CLIENT = $(BIN_DIR)/GETClient.class
 
-# Compile Java source files
-$(BIN_DIR)/%.class: $(SRC_DIR)/%.java
-	$(JAVAC) $(JAVAC_FLAGS) $<
+all: $(AGGREGATION_SERVER) $(CONTENT_SERVER) $(LAMPORT_CLOCK) $(GET_CLIENT)
 
-# Target to run the Aggregation Server
-run-aggregation-server:
-	java -cp .:$(BIN_DIR):$(wildcard *.jar) $(AGGREGATION_SERVER)
+$(AGGREGATION_SERVER): $(SOURCES)
+	$(JAVAC) -cp .:$(CLASSPATH) -d $(BIN_DIR) $^
 
-# Target to run the Content Server
-run-content-server:
-	java -cp .:$(BIN_DIR):$(wildcard *.jar) $(CONTENT_SERVER)
+$(CONTENT_SERVER): $(SOURCES)
+	$(JAVAC) -cp .:$(CLASSPATH) -d $(BIN_DIR) $^
 
-# Target to run the Lamport Clock
-run-lamport-clock:
-	java -cp .:$(BIN_DIR):$(wildcard *.jar) $(LAMPORT_CLOCK)
+$(LAMPORT_CLOCK): $(SOURCES)
+	$(JAVAC) -cp .:$(CLASSPATH) -d $(BIN_DIR) $^
 
-# Target to run the GET Client
-run-get-client:
-	java -cp .:$(BIN_DIR):$(wildcard *.jar) $(GET_CLIENT)
+$(GET_CLIENT): $(SOURCES)
+	$(JAVAC) -cp .:$(CLASSPATH) -d $(BIN_DIR) $^
 
-# Clean compiled class files
 clean:
-	rm -rf $(BIN_DIR)/*.class
+	rm -rf $(BIN_DIR)
+
+.PHONY: all clean

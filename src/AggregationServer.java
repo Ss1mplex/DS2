@@ -3,11 +3,15 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class AggregationServer {
     public static JSONObject weatherData = new JSONObject();
     public static String lastTimeBody;
-    public static int lamportClock = 0;
+    public static int lamportClock = 0; // 初始化Lamport时钟为0
+    public static long dataExpirationTime = 30 * 1000; // 数据过期时间（30秒）
 
     public static void parseToWeatherdata(String body) {
         body = body.replaceAll("[\\{\\}\"]", "");
@@ -20,6 +24,22 @@ public class AggregationServer {
     }
 
     public static void main(String[] args) {
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+
+        // active and check every period
+        executor.scheduleAtFixedRate(() -> {
+            long currentTime = System.currentTimeMillis();
+            if (lastTimeBody != null) {
+                long dataTimestamp = Long.parseLong(lastTimeBody.split("\"timestamp\":")[1].split(",")[0]);
+                if (currentTime - dataTimestamp > dataExpirationTime) {
+                    // clear the data
+                    weatherData = new JSONObject();
+                    lastTimeBody = null;
+                    System.out.println("Expired data has been purged.");
+                }
+            }
+        }, 0, 10, TimeUnit.SECONDS); // check every 10s
+
         try (ServerSocket serverSocket = new ServerSocket(4567)) {
             while (true) {
                 System.out.println("Aggregation server is working");

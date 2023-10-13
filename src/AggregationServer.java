@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 public class AggregationServer {
     public static JSONObject weatherData = new JSONObject();
     public static String lastTimeBody;
-    public static int lamportClock = 0; // 初始化Lamport时钟为0
-    public static long dataExpirationTime = 30 * 1000; // 数据过期时间（30秒）
+    public static int lamportClock = 0;
+    public static long dataExpirationTime = 30 * 1000;
 
     public static void parseToWeatherdata(String body) {
         body = body.replaceAll("[\\{\\}\"]", "");

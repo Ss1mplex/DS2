@@ -1,21 +1,26 @@
 public class LamportClock {
-    private long time;
+    private int value;
 
     public LamportClock() {
-        this.time = 0;
+        this.value = 0;
     }
 
-    public synchronized long getTime() {
-        return time;
+    public int getValue() {
+        return value;
     }
 
-    public synchronized void tick() {
+    public void tick() {
 
-        time++;
+        value++;
     }
 
-    public synchronized void updateClock(long receivedTime) {
+    public void sendEvent() {
 
-        time = Math.max(time, receivedTime) + 1;
+        value++;
+    }
+
+    public void receiveAction(int receivedValue) {
+
+        value = Math.max(value, receivedValue) + 1;
     }
 }

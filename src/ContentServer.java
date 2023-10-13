@@ -1,7 +1,6 @@
-import org.json.*;
-
 import java.io.*;
 import java.net.*;
+import org.json.JSONObject;
 
 public class ContentServer {
     public static void main(String[] args) {
@@ -18,6 +17,11 @@ public class ContentServer {
         if (args.length > 2) {
             dataFilePath = args[2];
         }
+        LamportClock lamport = new LamportClock();
+        lamport.tick();
+        int lamportClock = lamport.getValue();
+
+
 
         try {
             BufferedReader dataReader = new BufferedReader(new FileReader(dataFilePath));
@@ -29,7 +33,8 @@ public class ContentServer {
             Socket socket = new Socket(serverAddress, serverPort);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            String putRequest = createPutRequest("data.txt", jsonData);
+            // add lamportclock
+            String putRequest = createPutRequest("data.txt", jsonData, lamportClock);
             out.println(putRequest);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -66,12 +71,14 @@ public class ContentServer {
         return json.toString();
     }
 
-    private static String createPutRequest(String path, String jsonData) {
+    private static String createPutRequest(String path, String jsonData, int lamportClock) {
         StringBuilder request = new StringBuilder();
-        request.append("PUT ").append(path).append(" HTTP/1.1\n");
-        request.append("User-Agent: ATOMClient/1/0\n");
-        request.append("Content-Type: application/json\n");
-        request.append("Content-Length: ").append(jsonData.length()).append("\n\n");
+        request.append("PUT data.txt HTTP/1.1\r\n");
+        request.append("User-Agent: ATOMClient/1/0\r\n");
+        request.append("Content-Type: application/json\r\n");
+        request.append("Content-Length: ").append(jsonData.length()).append("\r\n");
+      //add lamport clock in PUT
+        request.append("Lamport-Clock: ").append(lamportClock).append("\r\n\r\n");
         request.append(jsonData);
 
         System.out.println("Request Sent: " + request);

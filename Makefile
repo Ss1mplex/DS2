@@ -1,42 +1,50 @@
-# Define the Java compiler
-JAVAC = javac
+# Makefile for your Java project
 
 # Define the source directory
 SRC_DIR = src
 
-# Define the output directory
-OUT_DIR = out
+# Define the Java compiler and flags
+JAVAC = javac
+JAVAC_FLAGS = -cp .:$(wildcard *.jar) -d bin
 
-# Find all .java files in the source directory
+# Define the main classes for your applications
+AGGREGATION_SERVER = AggregationServer
+CONTENT_SERVER = ContentServer
+LAMPORT_CLOCK = LamportClock
+GET_CLIENT = GETClient
+
+# Define the output directory
+BIN_DIR = bin
+
+# List of all Java source files
 SOURCES = $(wildcard $(SRC_DIR)/*.java)
 
-# Include the new source file LamportClock.java
-SOURCES += $(SRC_DIR)/LamportClock.java
+# List of all compiled class files
+CLASSES = $(SOURCES:$(SRC_DIR)/%.java=$(BIN_DIR)/%.class)
 
-# Create the corresponding .class file paths
-CLASSES = $(patsubst $(SRC_DIR)/%.java,$(OUT_DIR)/%.class,$(SOURCES))
-
-# Default target: build all .class files
+# Main target
 all: $(CLASSES)
 
-# Compile .java files to .class files
-$(OUT_DIR)/%.class: $(SRC_DIR)/%.java
-	$(JAVAC) -d $(OUT_DIR) $<
+# Compile Java source files
+$(BIN_DIR)/%.class: $(SRC_DIR)/%.java
+	$(JAVAC) $(JAVAC_FLAGS) $<
 
-# Clean the compiled .class files
-clean:
-	rm -rf $(OUT_DIR)
-
-# Run the AggregationServer
+# Target to run the Aggregation Server
 run-aggregation-server:
-	java -cp $(OUT_DIR) AggregationServer
+	java -cp .:$(BIN_DIR):$(wildcard *.jar) $(AGGREGATION_SERVER)
 
-# Run the ContentServer
+# Target to run the Content Server
 run-content-server:
-	java -cp $(OUT_DIR) ContentServer
+	java -cp .:$(BIN_DIR):$(wildcard *.jar) $(CONTENT_SERVER)
 
-# Run the GetClient
+# Target to run the Lamport Clock
+run-lamport-clock:
+	java -cp .:$(BIN_DIR):$(wildcard *.jar) $(LAMPORT_CLOCK)
+
+# Target to run the GET Client
 run-get-client:
-	java -cp $(OUT_DIR) GetClient
+	java -cp .:$(BIN_DIR):$(wildcard *.jar) $(GET_CLIENT)
 
-.PHONY: all clean run-aggregation-server run-content-server run-get-client
+# Clean compiled class files
+clean:
+	rm -rf $(BIN_DIR)/*.class

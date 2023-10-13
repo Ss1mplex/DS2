@@ -1,5 +1,8 @@
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 public class GETClient {
     public static void main(String[] args) {
@@ -13,28 +16,35 @@ public class GETClient {
             serverPort = Integer.parseInt(args[1]);
         }
 
+        Socket socket = null;
+
         try {
-            Socket socket = new Socket(serverAddress, serverPort);
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            socket = new Socket(serverAddress, serverPort);
 
+            while (true) {
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            String getRequest = "GET /data.txt HTTP/1.1";
-            out.println(getRequest);
-            out.println("User-Agent: GETClient/1.0");
-            out.println();
+                String getRequest = "GET /data.txt HTTP/1.1";
+                out.println(getRequest);
+                out.println("User-Agent: GETClient/1.0");
+                out.println();
 
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String response;
-            while ((response = in.readLine()) != null) {
-                System.out.println(response);
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String response;
+                while ((response = in.readLine()) != null) {
+                    System.out.println(response);
+                }
             }
-
-            out.close();
-            in.close();
-            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if (socket != null) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -1,28 +1,42 @@
 # Define the Java compiler
 JAVAC = javac
 
-# Define the options for the Java compiler
-JAVACFLAGS = -cp .:commons-beanutils-1.9.4.jar:commons-lang-2.6.jar:commons-logging-1.2.jar:ezmorph-1.0.6.jar:json-20230618.jar:json-lib-2.4-jdk15.jar:minimal-json-0.9.5.jar
-
 # Define the source directory
 SRC_DIR = src
 
-# Define the build directory
-BIN_DIR = bin
+# Define the output directory
+OUT_DIR = out
 
-# Define the Java source files
-JAVA_FILES = $(wildcard $(SRC_DIR)/*.java)
+# Find all .java files in the source directory
+SOURCES = $(wildcard $(SRC_DIR)/*.java)
 
-# Define the target classes
-CLASSES = $(JAVA_FILES:$(SRC_DIR)/%.java=$(BIN_DIR)/%.class)
+# Find all .jar files in the root directory
+LIBS = $(wildcard ./*.jar)
 
-# The default target to build all classes
+# Create the corresponding .class file paths
+CLASSES = $(patsybst $(SRC_DIR)/%.java,$(OUT_DIR)/%.class,$(SOURCES))
+
+# Default target: build all .class files
 all: $(CLASSES)
 
-# Build the classes from source
-$(BIN_DIR)/%.class: $(SRC_DIR)/%.java
-	$(JAVAC) $(JAVACFLAGS) -d $(BIN_DIR) $<
+# Compile .java files to ..class files with library included
+$(OUT_DIR)/%.class: $(SRC_DIR)/%.java
+	$(JAVAC) -d $(OUT_DIR) -cp $(LIBS) $<
 
-# Clean the compiled classes
+# Clean the compiled .class files
 clean:
-	rm -rf $(BIN_DIR)/*.class
+	rm -rf $(OUT_DIR)
+
+# Run the AggregationServer
+run-aggregation-server:
+	java -cp $(OUT_DIR):$(LIBS) AggregationServer
+
+# Run the ContentServer
+run-content-server:
+	java -cp $(OUT_DIR):$(LIBS) ContentServer
+
+# Run the GetClient
+run-get-client:
+	java -cp $(OUT_DIR) GetClient
+
+.PHONY: all clean run-aggregation-server run-content-server run-get-client
